@@ -4,11 +4,15 @@ set -e
 
 source ./util --source-only
 
-checkparams $1
+DEV=$1
+checkparams $DEV
 
 echo "Warning: this script will format and encrypt the device you specified. All data on the device will be irrecoverably lost."
 
-getkey
+PW=$(getpassword)
+checkpassword $PW
+
+KEY=$(getkey "$PW")
 
 echo "Encrypting device"
-sudo cryptsetup -v luksFormat $1 <<<$KEY
+sudo cryptsetup -v luksFormat $DEV <<<$KEY

@@ -1,33 +1,41 @@
 #!/bin/bash
 
-function checkparams() {
+checkparams() {
     if [ $# -eq 0 ]; then
-        echo "Please specify the device path (e.g. /dev/sdb)"
+        echo "Please specify the device path (e.g. /dev/sdb)" >&2
         exit 1
     fi
 
     if [ ! -b $1 ]; then
-        echo "$1 is not a valid target device"
+        echo "$1 is not a valid target device" >&2
         exit 1
     fi
 }
 
-function getkey() {
-    PW=$(systemd-ask-password "Enter your password:")
+getpassword() {
+    local PW=$(systemd-ask-password "Enter your password:")
     if [ -z "$PW" ]; then
-        echo "Please provide a password"
+        echo "Please provide a password" >&2
         exit 1
     fi
+    echo $PW
+}
 
-    PWCHECK=$(systemd-ask-password "Verify password:")
+checkpassword() {
+    local PW=$1
+    local PWCHECK=$(systemd-ask-password "Verify password:")
+
     if [ "$PW" != "$PWCHECK" ]; then
-        echo "Passwords do not match"
+        echo "Passwords do not match" >&2
         exit 1
     fi
+}
 
+getkey() {
+    local PW=$1
     CHALLENGE=$(printf $PW | sha256sum | awk '{print $1}')
-
-    echo "Touch your YubiKey"
+    echo "Touch your YubiKey" > /dev/tty
     RESPONSE=$(ykchalresp -2 $CHALLENGE)
-    KEY=$CHALLENGE$RESPONSE
+
+    echo $CHALLENGE$RESPONSE
 }
