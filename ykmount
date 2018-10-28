@@ -12,7 +12,10 @@ if [ ! -b $1 ]; then
     exit 1
 fi
 
+# Note: if you prefer not to use the systemd ask-password utility, remove the
+# following line and uncomment the one below it.
 PW=$(systemd-ask-password "Enter your password:")
+#echo "Enter your password" && read -s PW
 CHALLENGE=$(printf $PW | sha256sum | awk '{print $1}')
 
 echo "Touch your YubiKey"
