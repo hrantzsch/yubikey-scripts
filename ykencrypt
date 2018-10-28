@@ -2,24 +2,13 @@
 
 set -e
 
-if [ $# -eq 0 ]; then
-    echo "Please specify the device path (e.g. /dev/sdb)"
-    exit 1
-fi
+source ./util --source-only
 
-if [ ! -b $1 ]; then
-    echo "$1 is not a valid target device"
-    exit 1
-fi
+checkparams $1
 
 echo "Warning: this script will format and encrypt the device you specified. All data on the device will be irrecoverably lost."
 
-PW=$(systemd-ask-password "Enter your password:")
-CHALLENGE=$(printf $PW | sha256sum | awk '{print $1}')
-
-echo "Touch your YubiKey"
-RESPONSE=$(ykchalresp -2 $CHALLENGE)
-KEY=$CHALLENGE$RESPONSE
+getkey
 
 echo "Encrypting device"
 sudo cryptsetup -v luksFormat $1 <<<$KEY
