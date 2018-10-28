@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+if [ $# -eq 0 ]; then
+    echo "Please specify the device path (e.g. /dev/sdb)"
+    exit 1
+fi
+
+if [ ! -b $1 ]; then
+    echo "$1 is not a valid target device"
+    exit 1
+fi
+
+PW=$(systemd-ask-password "Enter your password:")
+CHALLENGE=$(printf $PW | sha256sum | awk '{print $1}')
+
+echo "Touch your YubiKey"
+RESPONSE=$(ykchalresp -2 $CHALLENGE)
+KEY=$CHALLENGE$RESPONSE
+
+echo "Decrypting and mounting device"
+sudo cryptsetup open --type=luks $1 data <<<$KEY
+
+mkdir -p $HOME/Data
+sudo mount /dev/mapper/data $HOME/Data
+echo "Opened $1 as /dev/mapper/data and mounted in $HOME/Data"
