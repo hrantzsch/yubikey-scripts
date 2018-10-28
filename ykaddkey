@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+source ./util --source-only
+
+DEV=$1
+checkparams $DEV
+
+echo "First provide your old password"
+PW=$(getpassword)
+OLDKEY=$(getkey "$PW")
+echo $OLDKEY
+
+echo "Now enter the new one"
+PW=$(getpassword)
+checkpassword "$PW"
+NEWKEY=$(getkey "$PW")
+echo $NEWKEY
+
+echo "Adding new key..."
+# sudo cryptsetup luksAddKey --key-slot 2 "$DEV" <<<"$OLDKEY" <<<"$NEWKEY"
