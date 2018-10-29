@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 checkparams() {
     if [ $# -eq 0 ]; then
         echo "Please specify the device path (e.g. /dev/sdb)" >&2
@@ -37,7 +39,7 @@ getkey() {
     local PW=$1
     CHALLENGE=$(printf $PW | sha256sum | awk '{print $1}')
     echo "Touch your YubiKey" > /dev/tty
-    RESPONSE=$(ykchalresp -2 $CHALLENGE)
+    RESPONSE=$(ykchalresp -2 $CHALLENGE) || exit 1
 
     echo $CHALLENGE$RESPONSE
 }
