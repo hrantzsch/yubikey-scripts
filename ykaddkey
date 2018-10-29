@@ -10,11 +10,11 @@ source ./util --source-only
 DEV=$1
 checkparams $DEV
 
-echo "First provide your old password"
+echo "Insert the YubiKey with which the device is encrypted and enter your password"
 PW=$(getpassword)
 OLDKEY=$(getkey "$PW")
 
-echo "Now enter the new one"
+echo "Now remove the first YubiKey, insert the new one and enter your new password"
 PW=$(getpassword)
 checkpassword "$PW"
 NEWKEY=$(getkey "$PW")
