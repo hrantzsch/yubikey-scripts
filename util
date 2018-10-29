@@ -6,6 +6,8 @@ checkparams() {
         exit 1
     fi
 
+    # If you want to work on something else than a block device, such as a
+    # `.img` file, remove the check below.
     if [ ! -b $1 ]; then
         echo "$1 is not a valid target device" >&2
         exit 1
